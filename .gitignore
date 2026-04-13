@@ -13,6 +13,10 @@ __pycache__/
 node_modules/
 frontend/dist/
 
+# Skills / configuracoes do agente
+.github/skills/
+skills/
+
 # IDE / SO
 .vscode/*
 !.vscode/extensions.json
