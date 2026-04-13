@@ -1,10 +1,12 @@
+"""Modelo de itens do pedido, relacionando produto e vendedor."""
+
 from sqlalchemy import String, Float, Integer, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base
+from app.database import BaseDeclarativa
 
 
-class ItemPedido(Base):
+class ItemPedido(BaseDeclarativa):
     __tablename__ = "itens_pedidos"
 
     id_pedido: Mapped[str] = mapped_column(

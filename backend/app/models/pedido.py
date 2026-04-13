@@ -1,13 +1,15 @@
+"""Modelo de pedido com status e datas de compra/entrega."""
+
 from datetime import datetime, date
 from typing import Optional
 
 from sqlalchemy import String, Float, DateTime, Date, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base
+from app.database import BaseDeclarativa
 
 
-class Pedido(Base):
+class Pedido(BaseDeclarativa):
     __tablename__ = "pedidos"
 
     id_pedido: Mapped[str] = mapped_column(String(32), primary_key=True)

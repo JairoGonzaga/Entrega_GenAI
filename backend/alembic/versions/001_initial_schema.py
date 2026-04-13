@@ -17,6 +17,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    """
+    Cria todas as tabelas iniciais do schema da aplicacao.
+    Define chaves primarias e relacionamentos basicos.
+    """
     op.create_table(
         "consumidores",
         sa.Column("id_consumidor", sa.String(32), primary_key=True),
@@ -84,6 +88,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    """
+    Remove as tabelas criadas nesta migracao inicial.
+    O drop segue a ordem inversa das dependencias.
+    """
     op.drop_table("avaliacoes_pedidos")
     op.drop_table("itens_pedidos")
     op.drop_table("pedidos")
