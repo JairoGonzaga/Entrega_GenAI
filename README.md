@@ -120,6 +120,52 @@ Com cobertura:
 pytest --cov=app --cov-report=term-missing
 ```
 
+Testes do frontend (Vitest):
+
+Na pasta frontend:
+
+```powershell
+corepack pnpm test
+```
+
+Modo watch:
+
+```powershell
+corepack pnpm test:watch
+```
+
+## Git Hook (pre-push)
+
+Para habilitar o hook versionado no repositorio:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\setup-git-hooks.ps1
+```
+
+Hooks configurados:
+- `.githooks/pre-commit`: valida frontend lint + backend pytest
+- `.githooks/pre-push`: valida frontend lint/test + backend pytest
+
+Ambos chamam o CLI versionado do repositorio:
+- `scripts/qa-cli.sh` (shell)
+- `scripts/qa-cli.ps1` (PowerShell)
+
+Uso manual no PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-commit
+powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-push
+powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 full
+```
+
+## GitLab CI
+
+Arquivo pronto: `.gitlab-ci.yml`
+
+Pipeline configurado com dois jobs:
+- `frontend_tests`: instala dependencias e roda lint, testes e build do frontend
+- `backend_tests`: instala dependencias Python e roda pytest do backend
+
 ## Endpoints principais
 
 Prefixo da API: /api

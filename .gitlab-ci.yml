@@ -1,0 +1,35 @@
+stages:
+  - test
+
+frontend_tests:
+  stage: test
+  image: node:20
+  cache:
+    key: frontend-pnpm
+    paths:
+      - frontend/node_modules/
+      - .pnpm-store/
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@10.33.0 --activate
+    - pnpm config set store-dir .pnpm-store
+  script:
+    - cd frontend
+    - pnpm install --frozen-lockfile
+    - pnpm lint
+    - pnpm test
+    - pnpm build
+
+backend_tests:
+  stage: test
+  image: python:3.12
+  cache:
+    key: backend-pip
+    paths:
+      - .cache/pip
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  script:
+    - python -m pip install --upgrade pip
+    - pip install -r backend/requirements.txt
+    - python -m pytest backend -q
