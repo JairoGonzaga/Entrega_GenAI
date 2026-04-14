@@ -136,7 +136,7 @@ corepack pnpm test:watch
 
 ## Git Hook (pre-push)
 
-Para habilitar o hook versionado no repositorio:
+Para habilitar os hooks locais do projeto:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\setup-git-hooks.ps1
@@ -146,7 +146,7 @@ Hooks configurados:
 - `.githooks/pre-commit`: valida frontend lint + backend pytest
 - `.githooks/pre-push`: valida frontend lint/test + backend pytest
 
-Ambos chamam o CLI versionado do repositorio:
+Ambos chamam o CLI local do projeto:
 - `scripts/qa-cli.sh` (shell)
 - `scripts/qa-cli.ps1` (PowerShell)
 
@@ -181,14 +181,12 @@ Prefixo da API: /api
 Healthcheck:
 - GET /
 
-## CI/CD - GitHub Actions
+## CI/CD
 
-Workflow automático configurado em `.github/workflows/frontend-ci.yml`:
+Pipeline automatizado configurado para validar frontend e backend:
 
 - **Frontend**: lint (ESLint), testes (Vitest) e build
 - **Backend**: testes (pytest)
-
-Executa automaticamente em push para main ou pull requests.
 
 ## Estrutura do codigo
 
@@ -229,24 +227,11 @@ Arquitetura modularizada:
 - Tratamento de erros com mensagens claras
 - Pronto para produção (Vercel ou similar)
 
-✅ DevOps
-- CI/CD GitHub Actions
+## DevOps
+- CI/CD automatizado
 - CI GitLab Pipeline (`.gitlab-ci.yml`)
 - Git hooks pre-push/pre-commit
 - QA CLI local versionado
-
-## Contribuindo
-
-Antes de enviar mudancas:
-
-```powershell
-# Executar validacoes locais
-powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 full
-```
-
-Alternativa (sem PowerShell):
-- Frontend: `corepack pnpm lint && corepack pnpm test && corepack pnpm build`
-- Backend: `pytest -v`
 
 ## Deploy
 

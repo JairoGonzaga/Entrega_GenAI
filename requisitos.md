@@ -11,8 +11,6 @@ Banco de Dados: SQLite (via SQLAlchemy ORM).
 
 Migrações: Alembic.
 
-Repositório Base: https://github.com/gabrielmpinha/rocketlab2026
-
 3. Requisitos Funcionais (RF)
 ID	Requisito	Descrição
 RF01	Catálogo de Produtos	O sistema deve exibir uma lista/grade de todos os produtos cadastrados.

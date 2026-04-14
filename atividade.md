@@ -10,11 +10,10 @@ O projeto deve ser criado com a seguinte stack:
 ● Banco de dados: SQLite
 Materiais: Para esta tarefa, serão fornecidos alguns recursos para que a atividade tenha foco
 nos conceitos passados em aula. Você receberá inicialmente:
-1. Um repositório contendo a estrutura base do projeto, o banco de dados modelado no
+1. Um pacote contendo a estrutura base do projeto, o banco de dados modelado no
 SQLAlchemy (ORM) e a ferramenta de migração de bancos de dados Alembic;
-a. Link do repositório do Github: https://github.com/gabrielmpinha/rocketlab2026
 2. Os arquivos .csv contendo os dados para população das tabelas.
-Você deverá desenvolver e versionar o projeto no GitHub com um README contendo o passo a
+Você deverá desenvolver e versionar o projeto com um README contendo o passo a
 passo para executar a aplicação.
 Requisitos:
 ● Eu gostaria de poder ter produtos com informações associadas;
