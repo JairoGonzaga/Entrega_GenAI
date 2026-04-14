@@ -42,7 +42,9 @@ def test_data_dir_points_to_repo_data_folder():
     data_dir = data_ingestion._data_dir()
 
     assert data_dir.name == "data_ingestao"
-    assert data_dir.parent.name == "Entrega_DEV_Visagio"
+    assert data_dir.parent.exists()
+    assert (data_dir.parent / "backend").exists()
+    assert (data_dir / "dim_produtos.csv").exists()
 
 
 def test_build_price_stats_and_insert_in_batches(tmp_path, test_engine):
