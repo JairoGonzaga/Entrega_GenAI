@@ -16,6 +16,10 @@ type ReviewCommentProps = {
   onToggle: () => void
 }
 
+type ReviewsSectionProps = {
+  reviews: ProductDetail['avaliacoes']
+}
+
 function ReviewComment({ comment, isExpanded, onToggle }: ReviewCommentProps) {
   const commentRef = useRef<HTMLElement | null>(null)
   const [isOverflowing, setIsOverflowing] = useState(false)
@@ -70,19 +74,8 @@ function ReviewComment({ comment, isExpanded, onToggle }: ReviewCommentProps) {
   )
 }
 
-export function ProductDetailsPanel({
-  detail,
-  isDetailLoading,
-  categoryImages,
-  formatCurrency,
-  formatDate,
-  categoryInitials,
-}: ProductDetailsPanelProps) {
+function ReviewsSection({ reviews }: ReviewsSectionProps) {
   const [expandedReviewIds, setExpandedReviewIds] = useState<Set<string>>(new Set())
-
-  useEffect(() => {
-    setExpandedReviewIds(new Set())
-  }, [detail?.id_produto])
 
   function toggleReview(reviewId: string) {
     setExpandedReviewIds((prev) => {
@@ -96,6 +89,42 @@ export function ProductDetailsPanel({
     })
   }
 
+  if (reviews.length === 0) {
+    return <p>Sem avaliacoes registradas.</p>
+  }
+
+  return (
+    <div className="reviews-scroll" role="region" aria-label="Lista de avaliacoes">
+      <ul className="reviews">
+        {reviews.map((avaliacao) => {
+          const isExpanded = expandedReviewIds.has(avaliacao.id_avaliacao)
+          const comment = avaliacao.comentario?.trim() || 'Sem comentario'
+
+          return (
+            <li key={avaliacao.id_avaliacao}>
+              <strong>{avaliacao.nota} / 5</strong>
+              <p>{avaliacao.titulo || 'Sem titulo'}</p>
+              <ReviewComment
+                comment={comment}
+                isExpanded={isExpanded}
+                onToggle={() => toggleReview(avaliacao.id_avaliacao)}
+              />
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+export function ProductDetailsPanel({
+  detail,
+  isDetailLoading,
+  categoryImages,
+  formatCurrency,
+  formatDate,
+  categoryInitials,
+}: ProductDetailsPanelProps) {
   return (
     <article className="details-card">
       <div className="section-head">
@@ -190,30 +219,7 @@ export function ProductDetailsPanel({
 
             <section>
               <h4>Avaliacoes</h4>
-              {detail.avaliacoes.length === 0 ? (
-                <p>Sem avaliacoes registradas.</p>
-              ) : (
-                <div className="reviews-scroll" role="region" aria-label="Lista de avaliacoes">
-                  <ul className="reviews">
-                    {detail.avaliacoes.map((avaliacao) => {
-                      const isExpanded = expandedReviewIds.has(avaliacao.id_avaliacao)
-                      const comment = avaliacao.comentario?.trim() || 'Sem comentario'
-
-                      return (
-                        <li key={avaliacao.id_avaliacao}>
-                          <strong>{avaliacao.nota} / 5</strong>
-                          <p>{avaliacao.titulo || 'Sem titulo'}</p>
-                          <ReviewComment
-                            comment={comment}
-                            isExpanded={isExpanded}
-                            onToggle={() => toggleReview(avaliacao.id_avaliacao)}
-                          />
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              )}
+              <ReviewsSection key={detail.id_produto} reviews={detail.avaliacoes} />
             </section>
           </div>
           </>
