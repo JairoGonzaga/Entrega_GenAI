@@ -242,10 +242,10 @@ def test_update_without_fields_returns_400(client, db_session):
 def test_category_images_endpoint(client, monkeypatch):
     from pathlib import Path
 
-    from app.routers import produtos
+    from app.routers.produtos import cache
 
-    monkeypatch.setattr(produtos, "_repo_data_dir", lambda: Path("./missing-test-dir"))
-    produtos._category_images.cache_clear()
+    monkeypatch.setattr(cache, "repo_data_dir", lambda: Path("./missing-test-dir"))
+    cache.category_images.cache_clear()
 
     response = client.get("/api/produtos/categorias-imagens")
 
