@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app import models  # noqa: F401
-from app.data_ingestion import populate_db_from_csv
 from app.database import Base, engine
 from app.routers import products_router
 
@@ -15,10 +14,9 @@ from app.routers import products_router
 def _run_startup_tasks() -> None:
     """
     Executa rotinas de inicializacao ao subir a aplicacao.
-    Cria tabelas, popula dados de exemplo e aplica indices.
+    Garante schema e indices para operar com banco existente.
     """
     Base.metadata.create_all(bind=engine)
-    populate_db_from_csv()
     _create_indexes()
 
 
@@ -52,13 +50,13 @@ def _create_indexes() -> None:
     Garante idempotencia usando IF NOT EXISTS em cada indice.
     """
     comandos = [
-        "CREATE INDEX IF NOT EXISTS idx_produtos_categoria ON produtos(categoria_produto)",
-        "CREATE INDEX IF NOT EXISTS idx_produtos_nome ON produtos(nome_produto)",
-        "CREATE INDEX IF NOT EXISTS idx_itens_pedido_produto ON itens_pedidos(id_produto)",
-        "CREATE INDEX IF NOT EXISTS idx_itens_pedido_produto_pedido ON itens_pedidos(id_produto, id_pedido)",
-        "CREATE INDEX IF NOT EXISTS idx_itens_pedido_pedido ON itens_pedidos(id_pedido)",
-        "CREATE INDEX IF NOT EXISTS idx_avaliacoes_pedido ON avaliacoes_pedidos(id_pedido)",
-        "CREATE INDEX IF NOT EXISTS idx_pedidos_data_compra ON pedidos(pedido_compra_timestamp)",
+        "CREATE INDEX IF NOT EXISTS idx_produtos_categoria ON dim_produtos(categoria_produto)",
+        "CREATE INDEX IF NOT EXISTS idx_produtos_nome ON dim_produtos(nome_produto)",
+        "CREATE INDEX IF NOT EXISTS idx_itens_pedido_produto ON fat_itens_pedidos(id_produto)",
+        "CREATE INDEX IF NOT EXISTS idx_itens_pedido_produto_pedido ON fat_itens_pedidos(id_produto, id_pedido)",
+        "CREATE INDEX IF NOT EXISTS idx_itens_pedido_pedido ON fat_itens_pedidos(id_pedido)",
+        "CREATE INDEX IF NOT EXISTS idx_avaliacoes_pedido ON fat_avaliacoes_pedidos(id_pedido)",
+        "CREATE INDEX IF NOT EXISTS idx_pedidos_data_compra ON fat_pedidos(pedido_compra_timestamp)",
     ]
 
     with engine.begin() as conexao:

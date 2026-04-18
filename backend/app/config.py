@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_DB_PATH = (BASE_DIR / "database.db").as_posix()
+DEFAULT_DB_PATH = (BASE_DIR / "Banco" / "banco.db").as_posix()
 
 
 class Settings(BaseSettings):

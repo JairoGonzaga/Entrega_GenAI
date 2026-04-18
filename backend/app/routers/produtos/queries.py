@@ -1,6 +1,6 @@
 """Queries complexas: CTEs, subqueries para listagem e detalhes."""
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, literal, or_, select
 from sqlalchemy.orm import Session
 
 from app.models.avaliacao_pedido import OrderReview
@@ -18,15 +18,20 @@ def group_products_base():
             func.min(Product.product_id).label("id_produto"),
             normalized_name_col.label("nome_produto"),
             Product.product_category.label("categoria_produto"),
-            func.max(Product.product_description).label("descricao_produto"),
-            func.avg(Product.base_price).label("preco_base"),
+            literal(None).label("descricao_produto"),
+            func.avg(OrderItem.price_brl).label("preco_base"),
             func.avg(Product.product_weight_grams).label("peso_produto_gramas"),
             func.avg(Product.length_cm).label("comprimento_centimetros"),
             func.avg(Product.height_cm).label("altura_centimetros"),
             func.avg(Product.width_cm).label("largura_centimetros"),
-            func.count(Product.product_id).label("quantidade_registros"),
+            func.count(func.distinct(Product.product_id)).label("quantidade_registros"),
         )
         .select_from(Product)
+        .outerjoin(OrderItem, OrderItem.product_id == Product.product_id)
+        .where(Product.product_name.is_not(None))
+        .where(Product.product_category.is_not(None))
+        .where(func.trim(Product.product_name) != "")
+        .where(func.trim(Product.product_category) != "")
         .group_by(normalized_name_col, Product.product_category)
         .cte("produtos_agrupados")
     )

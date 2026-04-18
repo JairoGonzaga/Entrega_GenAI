@@ -83,12 +83,12 @@ alembic revision -m "descricao da mudanca"
 
 ## Ingestao de dados
 
-A carga inicial usa os CSVs da pasta data_ingestao na raiz do repositorio.
+A API roda diretamente sobre o banco existente em `backend/Banco/banco.db`.
+A ingestao de CSVs nao faz parte do fluxo atual.
 
 Comportamento atual:
 - ao iniciar a API, tabelas sao criadas se nao existirem
-- a ingestao roda automaticamente
-- se as tabelas ja estiverem populadas, a ingestao nao duplica dados
+- indices sao aplicados para otimizar consultas
 
 ## Endpoints implementados
 
@@ -98,7 +98,6 @@ Prefixo base: /api
   - filtros: busca, categoria, preco_min, preco_max, nota_min
   - paginacao: skip e limit
 - GET /produtos/categorias
-- GET /produtos/categorias-imagens
 - GET /produtos/{id_produto}
 - POST /produtos (criar novo)
 - PUT /produtos/{id_produto} (atualizar)

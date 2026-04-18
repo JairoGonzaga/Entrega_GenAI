@@ -4,7 +4,7 @@ import { ProductDetailsPanel } from './components/ProductDetailsPanel'
 import { ProductFormModal } from './components/ProductFormModal'
 import { ProductListPanel } from './components/ProductListPanel'
 import { useCatalogPanel } from './useCatalogPanel'
-import { categoryInitials, formatCurrency, formatDate } from './utils'
+import { formatCurrency, formatDate } from './utils'
 
 export function CatalogPage() {
   const catalog = useCatalogPanel()
@@ -36,23 +36,19 @@ export function CatalogPage() {
           totalPages={catalog.totalPages}
           isLoading={catalog.isLoading}
           selectedId={catalog.selectedId}
-          categoryImages={catalog.categoryImages}
           onSelectItem={catalog.setSelectedId}
           onEditItem={catalog.openEditForm}
           onDeleteItem={(id) => void catalog.handleDeleteProduct(id)}
           onPreviousPage={() => void catalog.goToPage(catalog.page - 1)}
           onNextPage={() => void catalog.goToPage(catalog.page + 1)}
           formatCurrency={formatCurrency}
-          categoryInitials={categoryInitials}
         />
 
         <ProductDetailsPanel
           detail={catalog.detail}
           isDetailLoading={catalog.isDetailLoading}
-          categoryImages={catalog.categoryImages}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
-          categoryInitials={categoryInitials}
         />
       </section>
 

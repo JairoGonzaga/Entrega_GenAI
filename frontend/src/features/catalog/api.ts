@@ -1,4 +1,4 @@
-import type { CategoryImageMap, ProductDetail, ProductListResponse } from './types'
+import type { ProductDetail, ProductListResponse } from './types'
 
 const API_URL_BASE = import.meta.env.VITE_API_BASE_URL
 const API_CANDIDATES = Array.from(
@@ -100,22 +100,6 @@ export async function fetchCategories() {
   }
 
   return data as string[]
-}
-
-export async function fetchCategoryImages() {
-  const response = await fetchWithFallback('/produtos/categorias-imagens')
-  const data = response.ok ? await readJsonResponse(response) : null
-
-  if (!response.ok) {
-    const detail = await readErrorDetail(response)
-    throw new Error(detail ?? `Erro ${response.status} ao carregar imagens`)
-  }
-
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new Error('Resposta invalida de imagens')
-  }
-
-  return data as CategoryImageMap
 }
 
 export async function fetchProductDetail(productId: string) {

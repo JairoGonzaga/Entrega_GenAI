@@ -14,8 +14,6 @@ export type ProductListResponse = {
   itens: ProductListItem[]
 }
 
-export type CategoryImageMap = Record<string, string>
-
 export type OrderHistoryItem = {
   id_pedido: string
   data_pedido: string | null

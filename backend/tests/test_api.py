@@ -238,16 +238,3 @@ def test_update_without_fields_returns_400(client, db_session):
     assert response.status_code == 400
     assert response.json()["detail"] == "Nenhum campo para atualizar"
 
-
-def test_category_images_endpoint(client, monkeypatch):
-    from pathlib import Path
-
-    from app.routers.produtos import cache
-
-    monkeypatch.setattr(cache, "repo_data_dir", lambda: Path("./missing-test-dir"))
-    cache.category_images.cache_clear()
-
-    response = client.get("/api/produtos/categorias-imagens")
-
-    assert response.status_code == 200
-    assert response.json() == {}

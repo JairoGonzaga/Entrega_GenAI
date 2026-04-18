@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import {
   fetchCategories,
-  fetchCategoryImages,
   fetchWithFallback,
   fetchProductDetail,
   fetchProductList,
 } from './api'
-import { emptyForm, PAGE_SIZE, type CategoryImageMap, type ProductDetail, type ProductFormData, type ProductListItem } from './types'
+import { emptyForm, PAGE_SIZE, type ProductDetail, type ProductFormData, type ProductListItem } from './types'
 
 export function useCatalogPanel() {
   const [items, setItems] = useState<ProductListItem[]>([])
@@ -24,7 +23,6 @@ export function useCatalogPanel() {
   const [page, setPage] = useState(1)
   const [allCategories, setAllCategories] = useState<string[]>([])
   const [categoriesError, setCategoriesError] = useState<string | null>(null)
-  const [categoryImages, setCategoryImages] = useState<CategoryImageMap>({})
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -135,19 +133,6 @@ export function useCatalogPanel() {
     setPage(1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, debouncedCategories, debouncedMinRating])
-
-  useEffect(() => {
-    async function loadCategoryImages() {
-      try {
-        const data = await fetchCategoryImages()
-        setCategoryImages(data)
-      } catch (err) {
-        console.info('categorias:imagens', err)
-      }
-    }
-
-    void loadCategoryImages()
-  }, [])
 
   useEffect(() => {
     if (!selectedId) {
@@ -288,7 +273,6 @@ export function useCatalogPanel() {
     totalPages,
     allCategories,
     categoriesError,
-    categoryImages,
     isCategoryOpen,
     setIsCategoryOpen,
     selectedId,

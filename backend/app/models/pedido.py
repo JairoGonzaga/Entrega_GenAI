@@ -10,11 +10,11 @@ from app.database import Base
 
 
 class Order(Base):
-    __tablename__ = "pedidos"
+    __tablename__ = "fat_pedidos"
 
     order_id: Mapped[str] = mapped_column("id_pedido", String(32), primary_key=True)
     customer_id: Mapped[str] = mapped_column(
-        "id_consumidor", String(32), ForeignKey("consumidores.id_consumidor"), nullable=False
+        "id_consumidor", String(32), ForeignKey("dim_consumidores.id_consumidor"), nullable=False
     )
     status: Mapped[str] = mapped_column(String(50))
     purchase_timestamp: Mapped[Optional[datetime]] = mapped_column("pedido_compra_timestamp", DateTime, nullable=True)

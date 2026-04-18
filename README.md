@@ -1,253 +1,237 @@
-# Entrega DEV - Sistema de Gerenciamento de E-Commerce
+  # Entrega DEV - Sistema de Gerenciamento de E-Commerce
 
-Projeto full stack desenvolvido para o desafio de entrega do modulo DEV.
+  Projeto full stack desenvolvido para o desafio de entrega do modulo DEV.
 
-Stack usada:
-- Frontend: React + TypeScript + Vite
-- Backend: FastAPI (Python)
-- Banco: SQLite com SQLAlchemy
-- Migracoes: Alembic
+  Stack usada:
+  - Frontend: React + TypeScript + Vite
+  - Backend: FastAPI (Python)
+  - Banco: SQLite com SQLAlchemy
+  - Migracoes: Alembic
 
-## Objetivo da entrega
+  ## Objetivo da entrega
 
-Disponibilizar um painel para o perfil Gerente com:
-- catalogo de produtos
-- busca e filtros
-- detalhe de produto (medidas, historico de vendas e avaliacoes)
-- CRUD de produtos
-- media de avaliacoes por produto
+  Disponibilizar um painel para o perfil Gerente com:
+  - catalogo de produtos
+  - busca e filtros
+  - detalhe de produto (medidas, historico de vendas e avaliacoes)
+  - CRUD de produtos
+  - media de avaliacoes por produto
 
-## Estrutura
+  ## Estrutura
 
-```
-Entrega_DEV_Visagio/
-|- backend/          # API FastAPI, models, ingestao, testes e migracoes
-|- frontend/         # App React para o painel de catalogo
-|- data_ingestao/    # CSVs usados para carga inicial
-|- atividade.md      # Enunciado da atividade
-|- requisitos.md     # Documento de requisitos
-```
+  ```
+  Entrega_DEV_Visagio/
+  |- backend/          # API FastAPI, models, ingestao, testes e migracoes
+  |- frontend/         # App React para o painel de catalogo
+  |- data_ingestao/    # CSVs usados para carga inicial
+  |- atividade.md      # Enunciado da atividade
+  |- requisitos.md     # Documento de requisitos
+  ```
 
-## Como executar
+  ## Como executar
 
-## 1. Backend
+  ## 1. Backend
 
-Pre-requisitos:
-- Python 3.11+
+  Pre-requisitos:
+  - Python 3.11+
 
-Passos:
+  Passos:
 
-1. Abrir terminal na pasta backend
-2. Criar e ativar ambiente virtual
+  1. Abrir terminal na pasta backend
+  2. Criar e ativar ambiente virtual
 
-Windows (PowerShell):
+  Windows (PowerShell):
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
+  ```powershell
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+  ```
 
-3. Instalar dependencias
+  3. Instalar dependencias
 
-```powershell
-pip install -r requirements.txt
-```
+  ```powershell
+  pip install -r requirements.txt
+  ```
 
-4. (Opcional) aplicar migracoes
+  4. (Opcional) aplicar migracoes
 
-```powershell
-alembic upgrade head
-```
+  ```powershell
+  alembic upgrade head
+  ```
 
-5. Rodar API
+  5. Rodar API
 
-```powershell
-python -m app.main
-```
+  Esse comando e suficiente desde que voce esteja dentro da pasta `backend` com o ambiente virtual ativado.
 
-Backend disponivel em:
-- http://localhost:8000
-- Swagger: http://localhost:8000/docs
+  ```powershell
+  python -m app.main
+  ```
 
-Observacao:
-- Ao iniciar, a API cria tabelas, popula dados a partir dos CSVs (quando necessario) e cria indices.
+  Backend disponivel em:
+  - http://localhost:8000
+  - Swagger: http://localhost:8000/docs
 
-## 2. Frontend
+  Observacao:
+  - A API usa o banco existente em `backend/Banco/banco.db`.
+  - A ingestao via CSV nao e mais usada no fluxo atual.
 
-Pre-requisitos:
-- Node.js 20+
-- pnpm
+  ## 2. Frontend
 
-Passos:
+  Pre-requisitos:
+  - Node.js 20+
+  - pnpm
 
-1. Abrir terminal na pasta frontend
-2. Instalar dependencias
+  Passos:
 
-```powershell
-pnpm install
-```
+  1. Abrir terminal na pasta frontend
+  2. Instalar dependencias
 
-3. Rodar em modo desenvolvimento
+  ```powershell
+  pnpm install
+  ```
 
-```powershell
-pnpm dev
-```
+  3. Rodar em modo desenvolvimento
 
-Frontend disponivel em:
-- http://localhost:5173
+  ```powershell
+  pnpm dev
+  ```
 
-Configuracao de API:
-- O frontend tenta, nessa ordem: VITE_API_BASE_URL, /api, http://127.0.0.1:8000/api e http://localhost:8000/api.
-- Se quiser fixar a URL, crie frontend/.env com:
+  Frontend disponivel em:
+  - http://localhost:5173
 
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
-```
+  Configuracao de API:
+  - O frontend tenta, nessa ordem: VITE_API_BASE_URL, /api, http://127.0.0.1:8000/api e http://localhost:8000/api.
+  - O proxy de desenvolvimento do Vite aponta para o backend em http://127.0.0.1:8000.
+  - Se quiser fixar a URL, crie frontend/.env com:
 
-## Testes
+  ```env
+  VITE_API_BASE_URL=http://localhost:8000/api
+  ```
 
-Testes automatizados implementados no backend com pytest.
+  ## Testes
 
-Na pasta backend:
+  Testes automatizados implementados no backend com pytest.
 
-```powershell
-pytest -v
-```
+  Na pasta backend:
 
-Com cobertura:
+  ```powershell
+  pytest -v
+  ```
 
-```powershell
-pytest --cov=app --cov-report=term-missing
-```
+  Com cobertura:
 
-Testes do frontend (Vitest):
+  ```powershell
+  pytest --cov=app --cov-report=term-missing
+  ```
 
-Na pasta frontend:
+  Testes do frontend (Vitest):
 
-```powershell
-corepack pnpm test
-```
+  Na pasta frontend:
 
-Modo watch:
+  ```powershell
+  corepack pnpm test
+  ```
 
-```powershell
-corepack pnpm test:watch
-```
+  Modo watch:
 
-## Git Hook (pre-push)
+  ```powershell
+  corepack pnpm test:watch
+  ```
 
-Para habilitar os hooks locais do projeto:
+  ## Git Hook (pre-push)
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\setup-git-hooks.ps1
-```
+  Para habilitar os hooks locais do projeto:
 
-Hooks configurados:
-- `.githooks/pre-commit`: valida frontend lint + backend pytest
-- `.githooks/pre-push`: valida frontend lint/test + backend pytest
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\scripts\setup-git-hooks.ps1
+  ```
 
-Ambos chamam o CLI local do projeto:
-- `scripts/qa-cli.sh` (shell)
-- `scripts/qa-cli.ps1` (PowerShell)
+  Hooks configurados:
+  - `.githooks/pre-commit`: valida frontend lint + backend pytest
+  - `.githooks/pre-push`: valida frontend lint/test + backend pytest
 
-Uso manual no PowerShell:
+  Ambos chamam o CLI local do projeto:
+  - `scripts/qa-cli.sh` (shell)
+  - `scripts/qa-cli.ps1` (PowerShell)
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-commit
-powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-push
-powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 full
-```
+  Uso manual no PowerShell:
 
-## GitLab CI
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-commit
+  powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-push
+  powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 full
+  ```
 
-Arquivo pronto: `.gitlab-ci.yml`
+  ## GitLab CI
 
-Pipeline configurado com dois jobs:
-- `frontend_tests`: instala dependencias e roda lint, testes e build do frontend
-- `backend_tests`: instala dependencias Python e roda pytest do backend
+  Arquivo pronto: `.gitlab-ci.yml`
 
-## Endpoints principais
+  Pipeline configurado com dois jobs:
+  - `frontend_tests`: instala dependencias e roda lint, testes e build do frontend
+  - `backend_tests`: instala dependencias Python e roda pytest do backend
 
-Prefixo da API: /api
+  ## Endpoints principais
 
-- GET /produtos
-- GET /produtos/categorias
-- GET /produtos/categorias-imagens
-- GET /produtos/{id_produto}
-- POST /produtos
-- PUT /produtos/{id_produto}
-- DELETE /produtos/{id_produto}
+  Prefixo da API: /api
 
-Healthcheck:
-- GET /
+  - GET /produtos
+  - GET /produtos/categorias
+  - GET /produtos/{id_produto}
+  - POST /produtos
+  - PUT /produtos/{id_produto}
+  - DELETE /produtos/{id_produto}
 
-## CI/CD
+  Healthcheck:
+  - GET /
 
-Pipeline automatizado configurado para validar frontend e backend:
+  ## CI/CD
 
-- **Frontend**: lint (ESLint), testes (Vitest) e build
-- **Backend**: testes (pytest)
+  Pipeline automatizado configurado para validar frontend e backend:
 
-## Estrutura do codigo
+  - **Frontend**: lint (ESLint), testes (Vitest) e build
+  - **Backend**: testes (pytest)
 
-### Backend
+  ## Estrutura do codigo
 
-Organizacao por responsabilidade:
-- `models/`: definicoes de banco SQLAlchemy
-- `schemas/`: validacao Pydantic para request/response
-- `routers/`: endpoints da API
-- `database.py`: conexao e sessao
-- `data_ingestion.py`: importacao de CSVs
-- `main.py`: configuracao FastAPI
+  ### Backend
 
-### Frontend
+  Organizacao por responsabilidade:
+  - `models/`: definicoes de banco SQLAlchemy
+  - `schemas/`: validacao Pydantic para request/response
+  - `routers/`: endpoints da API
+  - `database.py`: conexao e sessao
+  - `data_ingestion.py`: importacao de CSVs
+  - `main.py`: configuracao FastAPI
 
-Arquitetura modularizada:
-- `src/features/catalog/`: dominio de catálogo isolado
-  - `types.ts`: tipos TypeScript
-  - `api.ts`: chamadas HTTP
-  - `utils.ts`: utilitarios (busca, paginacao)
-  - `useCatalogPanel.ts`: gerenciamento de estado
-  - `components/`: componentes UI
-  - `CatalogPage.tsx`: pagina principal
-- `src/App.tsx`: entrada da aplicacao
-- `src/App.css`: estilos globais
+  ### Frontend
 
-## Status atual da entrega
+  Arquitetura modularizada:
+  - `src/features/catalog/`: dominio de catálogo isolado
+    - `types.ts`: tipos TypeScript
+    - `api.ts`: chamadas HTTP
+    - `utils.ts`: utilitarios (busca, paginacao)
+    - `useCatalogPanel.ts`: gerenciamento de estado
+    - `components/`: componentes UI
+    - `CatalogPage.tsx`: pagina principal
+  - `src/App.tsx`: entrada da aplicacao
+  - `src/App.css`: estilos globais
 
-✅ Backend funcional
-- Ingestao de dados  
-- CRUD de produtos com validacoes
-- Testes cobrindo cenarios principais
+  ## Status atual da entrega
 
-✅ Frontend funcional
-- Listagem e filtros
-- Detalhes com historico de vendas e avaliacoes
-- Criacao, edicao e remocao de produtos
-- Tratamento de erros com mensagens claras
-- Pronto para produção (Vercel ou similar)
+  ✅ Backend funcional
+  - Ingestao de dados  
+  - CRUD de produtos com validacoes
+  - Testes cobrindo cenarios principais
 
-## DevOps
-- CI/CD automatizado
-- CI GitLab Pipeline (`.gitlab-ci.yml`)
-- Git hooks pre-push/pre-commit
-- QA CLI local versionado
+  ✅ Frontend funcional
+  - Listagem e filtros
+  - Detalhes com historico de vendas e avaliacoes
+  - Criacao, edicao e remocao de produtos
+  - Tratamento de erros com mensagens claras
+  - Pronto para produção (Vercel ou similar)
 
-## Deploy
-
-### Frontend (Vercel)
-
-1. Conectar repositorio no Vercel
-2. Build command: `corepack pnpm install && corepack pnpm build`
-3. Output directory: `dist`
-4. Env var: `VITE_API_BASE_URL` (URL da API em producao)
-
-### Backend (Heroku, Render, etc)
-
-1. Usar `Procfile` se necessario ou `python -m app.main`
-2. Instalar dependencias: `pip install -r requirements.txt`
-3. Configurar banco de dados (SQLite em disco ou PostgreSQL)
-
----
-
-**Desenvolvido em 2026 - Entrega DEV Challenge**
+  ## DevOps
+  - CI/CD automatizado
+  - CI GitLab Pipeline (`.gitlab-ci.yml`)
+  - Git hooks pre-push/pre-commit
+  - QA CLI local versionado

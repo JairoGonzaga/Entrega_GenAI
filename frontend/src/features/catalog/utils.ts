@@ -26,12 +26,3 @@ export function formatDate(value: string | null) {
 
   return new Date(value).toLocaleDateString('pt-BR')
 }
-
-export function categoryInitials(value: string) {
-  return value
-    .split('_')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('')
-}

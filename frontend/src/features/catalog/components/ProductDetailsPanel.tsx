@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import type { CategoryImageMap, ProductDetail } from '../types'
+import type { ProductDetail } from '../types'
 
 type ProductDetailsPanelProps = {
   detail: ProductDetail | null
   isDetailLoading: boolean
-  categoryImages: CategoryImageMap
   formatCurrency: (value: number | null) => string
   formatDate: (value: string | null) => string
-  categoryInitials: (value: string) => string
 }
 
 type ReviewCommentProps = {
@@ -120,10 +118,8 @@ function ReviewsSection({ reviews }: ReviewsSectionProps) {
 export function ProductDetailsPanel({
   detail,
   isDetailLoading,
-  categoryImages,
   formatCurrency,
   formatDate,
-  categoryInitials,
 }: ProductDetailsPanelProps) {
   return (
     <article className="details-card">
@@ -140,17 +136,6 @@ export function ProductDetailsPanel({
           <>
           <div className="summary-row">
             <div className="detail-hero">
-              <div className="detail-thumb">
-                {categoryImages[detail.categoria_produto] ? (
-                  <img
-                    src={categoryImages[detail.categoria_produto]}
-                    alt={detail.categoria_produto}
-                    loading="lazy"
-                  />
-                ) : (
-                  <span>{categoryInitials(detail.categoria_produto)}</span>
-                )}
-              </div>
               <div>
                 <h3>{detail.nome_produto}</h3>
                 <p>{detail.categoria_produto}</p>

@@ -34,8 +34,8 @@ def product_to_list_item(product: Product) -> ProductListItem:
         id_produto=product.product_id,
         nome_produto=product.product_name,
         categoria_produto=product.product_category,
-        descricao_produto=product.product_description,
-        preco_base=product.base_price,
+        descricao_produto=None,
+        preco_base=None,
         media_avaliacoes=None,
         total_vendas=0,
     )
@@ -46,8 +46,6 @@ def payload_to_model_fields(data: dict[str, object]) -> dict[str, object]:
     field_map = {
         "nome_produto": "product_name",
         "categoria_produto": "product_category",
-        "descricao_produto": "product_description",
-        "preco_base": "base_price",
         "peso_produto_gramas": "product_weight_grams",
         "comprimento_centimetros": "length_cm",
         "altura_centimetros": "height_cm",

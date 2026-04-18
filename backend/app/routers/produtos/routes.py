@@ -35,7 +35,6 @@ from .queries import (
     subquery_grouped_review_average,
     subquery_grouped_total_sales,
 )
-from .cache import category_images
 
 router = APIRouter(prefix="/produtos", tags=["Produtos"])
 
@@ -132,12 +131,6 @@ def list_categories(db: Session = Depends(get_db)):
     return [row.categoria_produto for row in rows]
 
 
-@router.get("/categorias-imagens")
-def list_category_images():
-    """Retorna dicionário de imagens cacheadas para categorias."""
-    return category_images()
-
-
 @router.get("/{id_produto}", response_model=ProductDetailResponse)
 def get_product_detail(
     id_produto: str = PathParam(..., pattern=ID_PATTERN),
@@ -194,10 +187,10 @@ def get_product_detail(
             func.avg(Product.length_cm).label("comprimento_centimetros"),
             func.avg(Product.height_cm).label("altura_centimetros"),
             func.avg(Product.width_cm).label("largura_centimetros"),
-            func.avg(Product.base_price).label("preco_base"),
-            func.max(Product.product_description).label("descricao_produto"),
+            func.avg(OrderItem.price_brl).label("preco_base"),
         )
         .select_from(Product)
+        .outerjoin(OrderItem, OrderItem.product_id == Product.product_id)
         .where(*group_filter)
     ).first()
 
@@ -216,8 +209,8 @@ def get_product_detail(
         id_produto=product.product_id,
         nome_produto=group_name,
         categoria_produto=group_category,
-        descricao_produto=measure_rows.descricao_produto if measure_rows else product.product_description,
-        preco_base=measure("preco_base", "base_price"),
+        descricao_produto=None,
+        preco_base=round_2(float(measure_rows.preco_base)) if measure_rows and measure_rows.preco_base is not None else None,
         medidas={
             "peso_produto_gramas": measure("peso_produto_gramas", "product_weight_grams"),
             "comprimento_centimetros": measure("comprimento_centimetros", "length_cm"),
@@ -274,6 +267,8 @@ def update_product(
         raise HTTPException(status_code=400, detail="Nenhum campo para atualizar")
 
     model_update_data = payload_to_model_fields(update_data)
+    if not model_update_data:
+        raise HTTPException(status_code=400, detail="Campos enviados nao existem no schema atual do banco")
 
     for field, value in model_update_data.items():
         setattr(product, field, value)

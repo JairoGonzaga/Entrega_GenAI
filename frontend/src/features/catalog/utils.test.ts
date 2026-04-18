@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { categoryInitials, formatCurrency, formatDate, toNumberOrNull } from './utils'
+import { formatCurrency, formatDate, toNumberOrNull } from './utils'
 
 describe('catalog utils', () => {
   it('converts numbers safely', () => {
@@ -16,8 +16,4 @@ describe('catalog utils', () => {
     expect(formatDate('2026-04-14T00:00:00.000Z')).toMatch(/\d{2}\/\d{2}\/\d{4}/)
   })
 
-  it('creates initials from category labels', () => {
-    expect(categoryInitials('casa_e_jardim')).toBe('CE')
-    expect(categoryInitials('eletronicos')).toBe('E')
-  })
 })

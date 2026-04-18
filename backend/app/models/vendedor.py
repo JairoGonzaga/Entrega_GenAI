@@ -7,7 +7,7 @@ from app.database import Base
 
 
 class Seller(Base):
-    __tablename__ = "vendedores"
+    __tablename__ = "dim_vendedores"
 
     seller_id: Mapped[str] = mapped_column("id_vendedor", String(32), primary_key=True)
     seller_name: Mapped[str] = mapped_column("nome_vendedor", String(255))

@@ -1,4 +1,4 @@
-import type { CategoryImageMap, ProductListItem } from '../types'
+import type { ProductListItem } from '../types'
 
 type ProductListPanelProps = {
   items: ProductListItem[]
@@ -7,14 +7,12 @@ type ProductListPanelProps = {
   totalPages: number
   isLoading: boolean
   selectedId: string | null
-  categoryImages: CategoryImageMap
   onSelectItem: (id: string) => void
   onEditItem: (item: ProductListItem) => void
   onDeleteItem: (id: string) => void
   onPreviousPage: () => void
   onNextPage: () => void
   formatCurrency: (value: number | null) => string
-  categoryInitials: (value: string) => string
 }
 
 export function ProductListPanel({
@@ -24,14 +22,12 @@ export function ProductListPanel({
   totalPages,
   isLoading,
   selectedId,
-  categoryImages,
   onSelectItem,
   onEditItem,
   onDeleteItem,
   onPreviousPage,
   onNextPage,
   formatCurrency,
-  categoryInitials,
 }: ProductListPanelProps) {
   return (
     <article className="catalog-card">
@@ -53,17 +49,6 @@ export function ProductListPanel({
               onClick={() => onSelectItem(item.id_produto)}
             >
               <div className="product-card">
-                <div className="product-thumb">
-                  {categoryImages[item.categoria_produto] ? (
-                    <img
-                      src={categoryImages[item.categoria_produto]}
-                      alt={item.categoria_produto}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <span>{categoryInitials(item.categoria_produto)}</span>
-                  )}
-                </div>
                 <div className="product-main">
                   <div className="product-title-row">
                     <h3>{item.nome_produto}</h3>

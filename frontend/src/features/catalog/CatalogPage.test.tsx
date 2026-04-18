@@ -140,13 +140,6 @@ function installFetchMock() {
       return jsonResponse(['eletronicos', 'moveis', 'casa'])
     }
 
-    if (url.pathname.endsWith('/api/produtos/categorias-imagens')) {
-      return jsonResponse({
-        eletronicos: 'https://img.test/eletronicos.png',
-        moveis: 'https://img.test/moveis.png',
-      })
-    }
-
     if (url.pathname.includes('/api/produtos/') && method === 'GET') {
       const productId = url.pathname.split('/').pop() ?? ''
       return jsonResponse(createDetail(productId))
