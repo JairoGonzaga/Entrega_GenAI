@@ -19,7 +19,7 @@ backend/
 |  |- main.py                  # Inicializacao da API, CORS e startup
 |  |- config.py                # Configuracoes e variaveis de ambiente
 |  |- database.py              # Engine, SessionLocal e Base
-|  |- data_ingestion.py        # Carga de dados via CSV
+|  |- data_ingestion.py        # Legado: carga via CSV, nao usada no fluxo atual
 |  |- models/                  # Models SQLAlchemy
 |  |- schemas/                 # Schemas Pydantic
 |  |- routers/
@@ -81,10 +81,10 @@ Criar nova migration:
 alembic revision -m "descricao da mudanca"
 ```
 
-## Ingestao de dados
+## Banco de dados
 
 A API roda diretamente sobre o banco existente em `backend/Banco/banco.db`.
-A ingestao de CSVs nao faz parte do fluxo atual.
+O arquivo `data_ingestion.py` permanece apenas como compatibilidade legada.
 
 Comportamento atual:
 - ao iniciar a API, tabelas sao criadas se nao existirem
@@ -119,7 +119,7 @@ pytest --cov=app --cov-report=term-missing --cov-report=html
 
 Testes implementados:
 - Endpoints de listagem, criacao, atualizacao e remocao
-- Ingestao de dados a partir de CSVs
+- Smoke test do banco SQLite versionado
 - Validacoes de entrada
 
 ## Notas de Producao

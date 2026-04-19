@@ -38,8 +38,6 @@ def seed_catalog(session):
                 product_id=SALE_PRODUCT_ID,
                 product_name="Cafeteira",
                 product_category="Casa",
-                product_description="Cafeteira eletrica",
-                base_price=100.0,
                 product_weight_grams=1200.0,
                 length_cm=30.0,
                 height_cm=25.0,
@@ -49,8 +47,6 @@ def seed_catalog(session):
                 product_id=FREE_PRODUCT_ID,
                 product_name="Livro",
                 product_category="Leitura",
-                product_description="Livro de teste",
-                base_price=50.0,
                 product_weight_grams=300.0,
                 length_cm=21.0,
                 height_cm=3.0,
@@ -76,6 +72,14 @@ def seed_catalog(session):
                 price_brl=100.0,
                 freight_price=10.0,
             ),
+            OrderItem(
+                order_id=ORDER_ID,
+                item_id=2,
+                product_id=FREE_PRODUCT_ID,
+                seller_id=SELLER_ID,
+                price_brl=50.0,
+                freight_price=5.0,
+            ),
             OrderReview(
                 review_id=REVIEW_ID,
                 order_id=ORDER_ID,
@@ -94,7 +98,7 @@ def test_healthcheck(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "message": "API rodando com sucesso!"}
+    assert response.json() == {"status": "ok", "message": "API running successfully!"}
 
 
 def test_list_categories_and_products(client, db_session):
@@ -204,8 +208,9 @@ def test_list_products_with_filters(client, db_session):
     assert by_max_price.json()["itens"][0]["id_produto"] == FREE_PRODUCT_ID
 
     assert by_min_rating.status_code == 200
-    assert by_min_rating.json()["total"] == 1
-    assert by_min_rating.json()["itens"][0]["id_produto"] == SALE_PRODUCT_ID
+    assert by_min_rating.json()["total"] == 2
+    ids = {item["id_produto"] for item in by_min_rating.json()["itens"]}
+    assert ids == {SALE_PRODUCT_ID, FREE_PRODUCT_ID}
 
 
 def test_validation_and_not_found_paths(client, db_session):

@@ -1,34 +1,39 @@
-"""Entrada da API: cria app, CORS, rotas e tarefas de startup."""
+"""API entry point: creates app, CORS, routes and startup tasks."""
 
 from contextlib import asynccontextmanager
 
+from google import genai
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app import models  # noqa: F401
+from app.config import settings
 from app.database import Base, engine
-from app.routers import products_router
+from app.routers import agent_router, products_router
 
 
 def _run_startup_tasks() -> None:
     """
-    Executa rotinas de inicializacao ao subir a aplicacao.
-    Garante schema e indices para operar com banco existente.
+    Run initialization routines when the application starts.
+    Ensures schema and indexes for operation with existing database.
     """
     Base.metadata.create_all(bind=engine)
     _create_indexes()
 
 
 @asynccontextmanager
-async def lifespan(_: FastAPI):
+async def lifespan(app: FastAPI):
     _run_startup_tasks()
+
+    api_key = settings.resolved_gemini_api_key
+    app.state.gemini_client = genai.Client(api_key=api_key) if api_key else None
     yield
 
 
 app = FastAPI(
-    title="Sistema de Compras Online",
-    description="API para gerenciamento de pedidos, produtos, consumidores e vendedores.",
+    title="Online Shopping System",
+    description="API for managing orders, products, customers and sellers.",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -42,14 +47,15 @@ app.add_middleware(
 )
 
 app.include_router(products_router, prefix="/api")
+app.include_router(agent_router, prefix="/api")
 
 
 def _create_indexes() -> None:
     """
-    Cria indices SQL para acelerar buscas comuns no catalogo.
-    Garante idempotencia usando IF NOT EXISTS em cada indice.
+    Create SQL indexes to speed up common catalog searches.
+    Ensures idempotency using IF NOT EXISTS for each index.
     """
-    comandos = [
+    commands = [
         "CREATE INDEX IF NOT EXISTS idx_produtos_categoria ON dim_produtos(categoria_produto)",
         "CREATE INDEX IF NOT EXISTS idx_produtos_nome ON dim_produtos(nome_produto)",
         "CREATE INDEX IF NOT EXISTS idx_itens_pedido_produto ON fat_itens_pedidos(id_produto)",
@@ -59,17 +65,17 @@ def _create_indexes() -> None:
         "CREATE INDEX IF NOT EXISTS idx_pedidos_data_compra ON fat_pedidos(pedido_compra_timestamp)",
     ]
 
-    with engine.begin() as conexao:
-        for comando in comandos:
-            conexao.execute(text(comando))
+    with engine.begin() as connection:
+        for command in commands:
+            connection.execute(text(command))
 
 @app.get("/", tags=["Health"])
 def healthcheck():
     """
-    Endpoint simples de healthcheck para monitoramento.
-    Retorna um payload minimo indicando que a API esta ativa.
+    Simple health check endpoint for monitoring.
+    Returns a minimal payload indicating the API is active.
     """
-    return {"status": "ok", "message": "API rodando com sucesso!"}
+    return {"status": "ok", "message": "API running successfully!"}
 
 
 if __name__ == "__main__":

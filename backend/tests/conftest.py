@@ -46,7 +46,6 @@ def client(test_engine, monkeypatch):
     monkeypatch.setattr(database, "engine", test_engine)
     monkeypatch.setattr(database, "SessionLocal", SessionLocal)
     monkeypatch.setattr(main, "engine", test_engine)
-    monkeypatch.setattr(main, "populate_db_from_csv", lambda: None)
     monkeypatch.setattr(main, "_create_indexes", lambda: None)
 
     database.Base.metadata.create_all(bind=test_engine)
