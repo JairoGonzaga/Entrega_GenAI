@@ -21,11 +21,6 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# Banco de dados
-*.db
-*.sqlite3
-database.db
-
 # Env
 .env
 .env.local
