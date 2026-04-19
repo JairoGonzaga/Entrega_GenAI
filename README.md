@@ -21,9 +21,8 @@
 
   ```
   Entrega_DEV_Visagio/
-  |- backend/          # API FastAPI, models, ingestao, testes e migracoes
+  |- backend/          # API FastAPI, models, testes e migracoes
   |- frontend/         # App React para o painel de catalogo
-  |- data_ingestao/    # CSVs usados para carga inicial
   |- atividade.md      # Enunciado da atividade
   |- requisitos.md     # Documento de requisitos
   ```
@@ -73,7 +72,7 @@
 
   Observacao:
   - A API usa o banco existente em `backend/Banco/banco.db`.
-  - A ingestao via CSV nao e mais usada no fluxo atual.
+  - `data_ingestion.py` e legado e nao faz parte do fluxo atual.
 
   ## 2. Frontend
 
@@ -200,7 +199,7 @@
   - `schemas/`: validacao Pydantic para request/response
   - `routers/`: endpoints da API
   - `database.py`: conexao e sessao
-  - `data_ingestion.py`: importacao de CSVs
+  - `data_ingestion.py`: compatibilidade legada, sem uso no fluxo atual
   - `main.py`: configuracao FastAPI
 
   ### Frontend
@@ -219,7 +218,6 @@
   ## Status atual da entrega
 
   ✅ Backend funcional
-  - Ingestao de dados  
   - CRUD de produtos com validacoes
   - Testes cobrindo cenarios principais
 
