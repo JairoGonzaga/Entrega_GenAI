@@ -19,7 +19,7 @@ def test_validate_user_input_rejects_too_long_question():
         guardrails.validate_user_input(long_question)
 
     assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Question too long (max 500 chars)"
+    assert exc_info.value.detail == "Pergunta longa demais, limite de 500 caracteres"
 
 
 @pytest.mark.parametrize(
@@ -36,7 +36,7 @@ def test_validate_user_input_rejects_prompt_injection_patterns(malicious_questio
         guardrails.validate_user_input(malicious_question)
 
     assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Invalid input detected"
+    assert exc_info.value.detail == "Input invalido detectado"
 
 
 def test_validate_sql_appends_limit_when_missing():
@@ -80,7 +80,7 @@ def test_validate_sql_rejects_blocked_keywords(keyword):
         guardrails.validate_sql(sql)
 
     assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == f"Invalid SQL: {keyword} not allowed"
+    assert exc_info.value.detail == f"SQL invalido: {keyword} nao permitido"
 
 
 def test_validate_sql_rejects_multiple_statements():
@@ -90,4 +90,4 @@ def test_validate_sql_rejects_multiple_statements():
         guardrails.validate_sql(sql)
 
     assert exc_info.value.status_code == 400
-    assert exc_info.value.detail == "Multiple queries not allowed"
+    assert exc_info.value.detail == "Multiplas consultas nao permitidas"

@@ -19,8 +19,7 @@ router = APIRouter(prefix="/agent", tags=["agent"])
 
 
 class QueryRequest(BaseModel):
-    """Payload de consulta em linguagem natural."""
-
+    """Classe responsavel por receber a pergunta do usuario e validar o formato basico."""
     question: str
 
 

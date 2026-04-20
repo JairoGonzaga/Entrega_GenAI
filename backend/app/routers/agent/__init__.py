@@ -1,4 +1,4 @@
-"""Agent module: endpoints and components for AI Analyst."""
+"""Modulo do agente: endpoints e componentes do Analista IA."""
 
 from .agent import router
 

@@ -1,4 +1,4 @@
-"""Security guardrails for agent input and SQL validation."""
+"""Guardrails de seguranca para entrada do agente e validacao de SQL."""
 
 import re
 
@@ -35,27 +35,27 @@ INJECTION_PATTERNS = [
 
 
 def validate_user_input(question: str) -> str:
-    """Validate user input for prompt injection attacks."""
+    """Valida entrada do usuario contra tentativas de prompt injection."""
     if len(question) > 500:
-        raise HTTPException(status_code=400, detail="Question too long (max 500 chars)")
+        raise HTTPException(status_code=400, detail="Pergunta longa demais, limite de 500 caracteres")
 
     for pattern in INJECTION_PATTERNS:
         if re.search(pattern, question, re.IGNORECASE):
-            raise HTTPException(status_code=400, detail="Invalid input detected")
+            raise HTTPException(status_code=400, detail="Input invalido detectado")
 
     return question.strip()
 
 
 def validate_sql(sql: str) -> str:
-    """Validate SQL query for dangerous operations and multi-statement execution."""
+    """Valida SQL contra operacoes perigosas e execucao de multiplas consultas."""
     sql_upper = sql.upper()
 
     for keyword in BLOCKED_SQL_KEYWORDS:
         if re.search(r"\b" + keyword + r"\b", sql_upper):
-            raise HTTPException(status_code=400, detail=f"Invalid SQL: {keyword} not allowed")
+            raise HTTPException(status_code=400, detail=f"SQL invalido: {keyword} nao permitido")
 
     if sql.count(";") > 1:
-        raise HTTPException(status_code=400, detail="Multiple queries not allowed")
+        raise HTTPException(status_code=400, detail="Multiplas consultas nao permitidas")
 
     if "LIMIT" not in sql_upper:
         sql = sql.rstrip(";") + " LIMIT 100"

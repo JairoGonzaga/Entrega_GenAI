@@ -1,4 +1,4 @@
-"""Prompts and domain context for Text-to-SQL agent."""
+"""Prompts e contexto de dominio para o agente Text-to-SQL."""
 
 import json
 import sqlite3
@@ -30,7 +30,7 @@ Mandatory SQL rules:
 
 
 def _quote_identifier(name: str) -> str:
-    """coloca identificadores do SQLite com seguranca."""
+    """Coloca identificadores do SQLite com seguranca."""
     return '"' + name.replace('"', '""') + '"'
 
 

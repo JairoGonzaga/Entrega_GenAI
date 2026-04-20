@@ -52,7 +52,7 @@ def test_agent_query_blocks_injection_input(client):
     )
 
     assert response.status_code == 400
-    assert response.json()["detail"] == "Invalid input detected"
+    assert response.json()["detail"] == "Input invalido detectado"
 
 
 def test_agent_query_stream_returns_sse_payload(client, monkeypatch):
@@ -60,6 +60,7 @@ def test_agent_query_stream_returns_sse_payload(client, monkeypatch):
 
     async def _fake_stream(_question: str, _session_id: str, _client):
         yield f"data: {json.dumps({'type': 'meta', 'sql': 'SELECT 1 LIMIT 100', 'dados': [], 'categoria': 'general'})}\\n\\n"
+        yield f"data: {json.dumps({'type': 'followups', 'items': ['f1', 'f2', 'f3']})}\\n\\n"
         yield f"data: {json.dumps({'type': 'done', 'followups': ['f1', 'f2', 'f3']})}\\n\\n"
 
     monkeypatch.setattr(agent_module, "_stream_response", _fake_stream)
@@ -73,4 +74,5 @@ def test_agent_query_stream_returns_sse_payload(client, monkeypatch):
     assert response.status_code == 200
     assert "text/event-stream" in response.headers["content-type"]
     assert '"type": "meta"' in response.text
+    assert '"type": "followups"' in response.text
     assert '"type": "done"' in response.text
