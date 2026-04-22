@@ -60,9 +60,13 @@ def interpret_sync(question: str, rows: list[dict], category: str, client: genai
         return _fallback_interpretation(question, rows)
 
     prompt = _build_interpretation_prompt(question, rows, category)
-    response = client.models.generate_content(model=MODEL_NAME, contents=prompt)
-    text = (response.text or "").strip()
-    return text or _fallback_interpretation(question, rows)
+    try:
+        response = client.models.generate_content(model=MODEL_NAME, contents=prompt)
+        text = (response.text or "").strip()
+        return text or _fallback_interpretation(question, rows)
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Interpretation sync fallback due to model error: %s", exc)
+        return _fallback_interpretation(question, rows)
 
 
 async def interpret_stream(

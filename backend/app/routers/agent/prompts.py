@@ -26,6 +26,7 @@ Mandatory SQL rules:
     - Use COALESCE for nullable numeric fields when appropriate.
 - For ratio/percentage metrics, avoid integer division (cast when needed).
 - For date/time filters, use SQLite-compatible expressions only.
+- For textual categorical columns, compare using exact string values from sample_values (never invent boolean True/False).
 """
 
 
@@ -49,6 +50,55 @@ def _is_textual_column(column_type: str) -> bool:
     return any(token in normalized for token in ("TEXT", "CHAR", "CLOB", "VARCHAR"))
 
 
+def _distinct_count_with_limit(
+    conn: sqlite3.Connection,
+    table: str,
+    col_name: str,
+    limit: int,
+) -> int:
+    """Conta distintos ate um limite para estimar cardinalidade sem custo alto."""
+    query = (
+        "SELECT COUNT(*) FROM ("
+        f"SELECT DISTINCT {_quote_identifier(col_name)} "
+        f"FROM {_quote_identifier(table)} "
+        f"WHERE {_quote_identifier(col_name)} IS NOT NULL "
+        f"LIMIT {max(1, limit)}"
+        ")"
+    )
+    return int(conn.execute(query).fetchone()[0])
+
+
+def _select_textual_columns_for_sampling(
+    conn: sqlite3.Connection,
+    table: str,
+    columns: list[tuple],
+    max_columns: int,
+    max_categorical_distinct: int = 20,
+) -> list[tuple]:
+    """Seleciona colunas textuais por verificacao SQL de cardinalidade (categoricas)."""
+    textual_columns = [c for c in columns if _is_textual_column(c[2])]
+    if not textual_columns:
+        return []
+
+    scored: list[tuple[int, str, tuple]] = []
+    overflow_limit = max_categorical_distinct + 1
+    for col in textual_columns:
+        col_name = str(col[1])
+        distinct_count = _distinct_count_with_limit(conn, table, col_name, overflow_limit)
+        if 2 <= distinct_count <= max_categorical_distinct:
+            scored.append((distinct_count, col_name, col))
+
+    if not scored:
+        for col in textual_columns:
+            col_name = str(col[1])
+            distinct_count = _distinct_count_with_limit(conn, table, col_name, max_categorical_distinct)
+            if distinct_count > 0:
+                scored.append((distinct_count, col_name, col))
+
+    scored.sort(key=lambda item: (item[0], item[1]))
+    return [item[2] for item in scored[:max_columns]]
+
+
 def _get_sample_values(
     conn: sqlite3.Connection,
     table: str,
@@ -58,9 +108,9 @@ def _get_sample_values(
 ) -> list[str]:
     """Coleta pequenas amostras de valores para colunas textuais."""
     lines: list[str] = []
-    textual_columns = [c for c in columns if _is_textual_column(c[2])]
+    textual_columns = _select_textual_columns_for_sampling(conn, table, columns, max_columns=max_columns)
 
-    for _, col_name, _, _, _, _ in textual_columns[:max_columns]:
+    for _, col_name, _, _, _, _ in textual_columns:
         query = (
             f"SELECT DISTINCT {_quote_identifier(col_name)} "
             f"FROM {_quote_identifier(table)} "

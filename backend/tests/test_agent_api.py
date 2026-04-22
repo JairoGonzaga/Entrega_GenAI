@@ -1,5 +1,7 @@
 import json
 
+from fastapi import HTTPException
+
 
 def _mock_pipeline_output():
     return {
@@ -76,3 +78,21 @@ def test_agent_query_stream_returns_sse_payload(client, monkeypatch):
     assert '"type": "meta"' in response.text
     assert '"type": "followups"' in response.text
     assert '"type": "done"' in response.text
+
+
+def test_agent_query_returns_429_when_pipeline_hits_quota(client, monkeypatch):
+    from app.routers.agent import agent as agent_module
+
+    def _fake_pipeline(_question: str, _session_id: str, _client):
+        raise HTTPException(status_code=429, detail="Cota da Gemini API excedida")
+
+    monkeypatch.setattr(agent_module, "_run_query_pipeline", _fake_pipeline)
+
+    response = client.post(
+        "/api/agent/query",
+        json={"question": "Qual a receita total?"},
+        headers={"X-Session-ID": "sess-429"},
+    )
+
+    assert response.status_code == 429
+    assert "Cota da Gemini API excedida" in response.json()["detail"]

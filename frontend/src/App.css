@@ -225,25 +225,37 @@
 }
 
 .message-sql {
-  white-space: pre-wrap;
-  word-break: break-all;
+  width: 100%;
+  white-space: pre;
+  overflow: auto;
   margin: 0;
   padding: 0.75rem;
   border-radius: 8px;
   font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   line-height: 1.4;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  resize: vertical;
+  min-height: 7rem;
+  max-height: 28rem;
   background: rgba(0, 0, 0, 0.03);
 }
 
 .message-group.user .message-sql {
   background: rgba(255, 255, 255, 0.1);
   color: #f0f4ff;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .message-group.assistant .message-sql {
   background: #f0f4ff;
   color: #0033cc;
+  border-color: #c8d7ff;
+}
+
+.message-sql:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.22);
 }
 
 .message-table-preview {
@@ -385,8 +397,10 @@
   padding: 0.75rem 1rem;
   font-family: inherit;
   font-size: 0.95rem;
+  line-height: 1.4;
   resize: none;
-  max-height: 120px;
+  min-height: calc(1.4em + 1.5rem);
+  overflow-y: hidden;
   transition: border-color 200ms ease, box-shadow 200ms ease;
   background: #ffffff;
 }
@@ -421,6 +435,14 @@
   justify-content: center;
   transition: transform 150ms ease, box-shadow 150ms ease;
   box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+}
+
+.send-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
 }
 
 .send-button:hover:not(:disabled) {
