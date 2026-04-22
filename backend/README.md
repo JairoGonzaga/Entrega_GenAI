@@ -1,157 +1,72 @@
-# Backend - Sistema de Compras Online
+# Backend do Agente
 
-API REST em FastAPI para gerenciamento de catalogo de produtos com metricas de vendas e avaliacoes.
+Este diretório contém a API e a implementação do agente Text-to-SQL do projeto.
 
-## Tecnologias
+## Estrutura
 
-- Python 3.11+
-- FastAPI
-- SQLAlchemy
-- Alembic
-- SQLite
-- Pytest
-
-## Estrutura principal
-
-```
+```text
 backend/
 |- app/
-|  |- main.py                  # Inicializacao da API, CORS e startup
-|  |- config.py                # Configuracoes e variaveis de ambiente
-|  |- database.py              # Engine, SessionLocal e Base
-|  |- data_ingestion.py        # Legado: carga via CSV, nao usada no fluxo atual
-|  |- models/                  # Models SQLAlchemy
-|  |- schemas/                 # Schemas Pydantic
+|  |- main.py                  # Sobe a API e registra o agente
+|  |- config.py                # Variáveis de ambiente e configurações
+|  |- database.py              # Conexão com o SQLite
+|  |- models/                  # Models do banco
 |  |- routers/
-|     |- produtos.py           # Endpoints de produtos
-|- alembic/
-|  |- versions/                # Migracoes
-|- tests/
-|  |- test_api.py
-|  |- test_data_ingestion.py
-|- scripts/
-|  |- contar_categorias.py
-|- requirements.txt
-|- pytest.ini
-|- alembic.ini
+|     |- agent/                # Lógica principal do agente
+|     |  |- agent.py           # Endpoints HTTP do agente
+|     |  |- pipeline.py        # Orquestração da pergunta até a resposta
+|     |  |- prompts.py         # Schema, regras e contexto do banco
+|     |  |- guardrails.py      # Validações de segurança
+|     |  |- intent.py          # Classificação da intenção da pergunta
+|     |  |- memory.py          # Memória por sessão
+|     |  |- llm.py             # Integração com Gemini
+|     |  |- interpreter.py     # Interpretação dos resultados
+|- tests/                      # Testes automatizados do agente e da API
+|- Banco/                      # Banco SQLite usado pelo projeto
 ```
 
-## Setup rapido
+## Como o agente funciona
 
-1. Criar ambiente virtual e ativar:
+1. O usuário envia uma pergunta em linguagem natural.
+2. O backend valida a entrada com guardrails.
+3. O agente identifica a intenção da pergunta.
+4. O schema do SQLite é lido dinamicamente para capturar tabelas, chaves, tipos e valores reais de colunas categóricas.
+5. O agente monta um plano interno de consulta.
+6. O Gemini gera o SQL somente de leitura.
+7. O SQL é validado antes da execução.
+8. O SQLite executa a consulta.
+9. O resultado é interpretado em português.
+10. A resposta é devolvida com contexto de sessão e sugestões de follow-up.
+
+## Por que essa arquitetura foi escolhida
+
+- **Segurança primeiro**: o fluxo passa por guardrails antes do banco.
+- **Melhor grounding**: o prompt usa schema real, chaves, tipos e amostras do banco.
+- **Baixo acoplamento**: cada responsabilidade fica em um módulo separado.
+- **Testabilidade**: planejamento, geração, reparo e interpretação têm testes próprios.
+- **Escalabilidade do fluxo**: a mesma estrutura suporta resposta JSON e streaming SSE.
+
+## Como usar o backend
+
+1. Copie o exemplo de ambiente para `.env`:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+copy .env.example .env
 ```
 
-2. Instalar dependencias:
+2. Se quiser usar o Gemini, ajuste a chave em `.env`:
 
-```powershell
-pip install -r requirements.txt
+```dotenv
+GEMINI_API_KEY=CHAVE_GEMINI_API_KEY
 ```
 
-3. Rodar API:
+3. Inicie a API:
 
 ```powershell
 python -m app.main
 ```
 
-Acessos:
-- API: http://localhost:8000
-- Docs Swagger: http://localhost:8000/docs
+## Observações
 
-## Banco e migracoes
-
-Aplicar todas as migracoes:
-
-```powershell
-alembic upgrade head
-```
-
-Ver migration atual:
-
-```powershell
-alembic current
-```
-
-Criar nova migration:
-
-```powershell
-alembic revision -m "descricao da mudanca"
-```
-
-## Banco de dados
-
-A API roda diretamente sobre o banco existente em `backend/Banco/banco.db`.
-O arquivo `data_ingestion.py` permanece apenas como compatibilidade legada.
-
-Comportamento atual:
-- ao iniciar a API, tabelas sao criadas se nao existirem
-- indices sao aplicados para otimizar consultas
-
-## Endpoints implementados
-
-Prefixo base: /api
-
-- GET /produtos
-  - filtros: busca, categoria, preco_min, preco_max, nota_min
-  - paginacao: skip e limit
-- GET /produtos/categorias
-- GET /produtos/{id_produto}
-- POST /produtos (criar novo)
-- PUT /produtos/{id_produto} (atualizar)
-- DELETE /produtos/{id_produto} (deletar)
-
-## Testes
-
-Cobertura de testes com pytest:
-
-```powershell
-pytest -v
-```
-
-Com cobertura de codigo:
-
-```powershell
-pytest --cov=app --cov-report=term-missing --cov-report=html
-```
-
-Testes implementados:
-- Endpoints de listagem, criacao, atualizacao e remocao
-- Smoke test do banco SQLite versionado
-- Validacoes de entrada
-
-## Notas de Producao
-
-- SQLite atual é adequado para desenvolvimento.
-- Para producao com multiplos usuarios, considere PostgreSQL.
-- CORS habilitado para http://localhost:5173 (desenvolvi
-to).
-  - Ajuste em `app/config.py` para dominios de producao.
-- Indices criados automaticamente nas tabelas principais.
-
-Healthcheck:
-- GET /
-
-## Testes
-
-Rodar toda a suite:
-
-```powershell
-pytest -v
-```
-
-Cobertura:
-
-```powershell
-pytest --cov=app --cov-report=term-missing
-```
-
-Escopo de testes atual:
-- healthcheck
-- listagem e filtros de produtos
-- detalhe com historico e avaliacoes
-- CRUD de produtos
-- caminhos de validacao e not found
-- ingestao de dados e funcoes auxiliares
+- O arquivo `.env.example` já vem com um placeholder para a chave do Gemini.
+- Se a chave não estiver preenchida, as rotas do agente retornam uma mensagem amigável de configuração ausente.

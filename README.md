@@ -1,235 +1,100 @@
-  # Entrega DEV - Sistema de Gerenciamento de E-Commerce
+# E-Commerce AI Analyst
 
-  Projeto full stack desenvolvido para o desafio de entrega do modulo DEV.
+Agente analítico em linguagem natural para consultar o banco do e-commerce via Text-to-SQL, com guardrails, validação de SQL, execução segura e interpretação em português.
 
-  Stack usada:
-  - Frontend: React + TypeScript + Vite
-  - Backend: FastAPI (Python)
-  - Banco: SQLite com SQLAlchemy
-  - Migracoes: Alembic
+## O que o agente faz
 
-  ## Objetivo da entrega
+- recebe perguntas em linguagem natural
+- identifica a intenção da pergunta
+- lê o schema do SQLite e usa chaves, tipos e amostras de valores reais
+- monta um plano interno de consulta
+- gera SQL apenas de leitura
+- valida o SQL antes de executar
+- executa a consulta no banco local
+- interpreta o resultado em português
+- mantém contexto por sessão
+- sugere perguntas de continuidade
 
-  Disponibilizar um painel para o perfil Gerente com:
-  - catalogo de produtos
-  - busca e filtros
-  - detalhe de produto (medidas, historico de vendas e avaliacoes)
-  - CRUD de produtos
-  - media de avaliacoes por produto
+## Como configurar
 
-  ## Estrutura
+1. Copie o arquivo de exemplo de ambiente:
 
-  ```
-  Entrega_DEV_Visagio/
-  |- backend/          # API FastAPI, models, testes e migracoes
-  |- frontend/         # App React para o painel de catalogo
-  |- atividade.md      # Enunciado da atividade
-  |- requisitos.md     # Documento de requisitos
-  ```
+```powershell
+copy backend\.env.example backend\.env
+```
 
-  ## Como executar
+2. Se quiser respostas reais do Gemini, preencha uma das chaves no `backend\.env`:
+- `GEMINI_API_KEY`
+- `GOOGLE_API_KEY`
 
-  ## 1. Backend
+3. O banco SQLite já vem apontado no exemplo de ambiente. Se necessário, ajuste `DATABASE_URL` para o arquivo do seu ambiente.
 
-  Pre-requisitos:
-  - Python 3.11+
+## Como executar
 
-  Passos:
+Abra dois terminais na raiz do projeto.
 
-  1. Abrir terminal na pasta backend
-  2. Criar e ativar ambiente virtual
+No primeiro terminal, inicie a aplicação principal:
 
-  Windows (PowerShell):
+```powershell
+cd backend
+python -m app.main
+```
 
-  ```powershell
-  python -m venv .venv
-  .\.venv\Scripts\Activate.ps1
-  ```
+No segundo terminal, inicie a interface local do agente:
 
-  3. Instalar dependencias
+```powershell
+cd frontend
+corepack pnpm install
+corepack pnpm dev
+```
 
-  ```powershell
-  pip install -r requirements.txt
-  ```
+Acesse a interface em:
+- http://localhost:5173
 
-  4. (Opcional) aplicar migracoes
+A API do agente fica disponível em:
+- http://localhost:8000
 
-  ```powershell
-  alembic upgrade head
-  ```
+## Como usar
 
-  5. Rodar API
+1. Abra a interface local.
+2. Digite uma pergunta em português.
+3. Pressione `Enter` para enviar.
+4. Use `Shift+Enter` para quebrar linha.
+5. Veja o SQL gerado, os dados retornados e a interpretação em português.
 
-  Esse comando e suficiente desde que voce esteja dentro da pasta `backend` com o ambiente virtual ativado.
+Exemplos de perguntas:
+- Top 10 produtos mais vendidos
+- Percentual de pedidos entregues no prazo por estado
+- Média de avaliação por vendedor
+- Estados com maior ticket médio
+- Categorias com maior taxa de avaliação negativa
 
-  ```powershell
-  python -m app.main
-  ```
+## Observação sobre Gemini
 
-  Backend disponivel em:
-  - http://localhost:8000
-  - Swagger: http://localhost:8000/docs
+Se nenhuma chave de API estiver configurada, o projeto continua subindo, mas as rotas do agente que dependem do Gemini retornam uma mensagem amigável indicando que a API não está configurada.
 
-  Observacao:
-  - A API usa o banco existente em `backend/Banco/banco.db`.
-  - `data_ingestion.py` e legado e nao faz parte do fluxo atual.
+## Arquivos importantes
 
-  ## 2. Frontend
+- `backend/app/routers/agent/agent.py`: endpoints do agente
+- `backend/app/routers/agent/pipeline.py`: orquestração do fluxo do agente
+- `backend/app/routers/agent/llm.py`: integração com Gemini e tratamento de erros
+- `backend/app/routers/agent/prompts.py`: schema, regras e contexto do banco
+- `backend/app/routers/agent/guardrails.py`: validações de segurança
+- `backend/app/routers/agent/memory.py`: memória por sessão
+- `backend/app/routers/agent/interpreter.py`: interpretação e follow-ups
 
-  Pre-requisitos:
-  - Node.js 20+
-  - pnpm
+## Testes
 
-  Passos:
+Rodar a suíte do backend:
 
-  1. Abrir terminal na pasta frontend
-  2. Instalar dependencias
+```powershell
+cd backend
+python -m pytest -q
+```
 
-  ```powershell
-  pnpm install
-  ```
+Rodar a suíte da interface:
 
-  3. Rodar em modo desenvolvimento
-
-  ```powershell
-  pnpm dev
-  ```
-
-  Frontend disponivel em:
-  - http://localhost:5173
-
-  Configuracao de API:
-  - O frontend tenta, nessa ordem: VITE_API_BASE_URL, /api, http://127.0.0.1:8000/api e http://localhost:8000/api.
-  - O proxy de desenvolvimento do Vite aponta para o backend em http://127.0.0.1:8000.
-  - Se quiser fixar a URL, crie frontend/.env com:
-
-  ```env
-  VITE_API_BASE_URL=http://localhost:8000/api
-  ```
-
-  ## Testes
-
-  Testes automatizados implementados no backend com pytest.
-
-  Na pasta backend:
-
-  ```powershell
-  pytest -v
-  ```
-
-  Com cobertura:
-
-  ```powershell
-  pytest --cov=app --cov-report=term-missing
-  ```
-
-  Testes do frontend (Vitest):
-
-  Na pasta frontend:
-
-  ```powershell
-  corepack pnpm test
-  ```
-
-  Modo watch:
-
-  ```powershell
-  corepack pnpm test:watch
-  ```
-
-  ## Git Hook (pre-push)
-
-  Para habilitar os hooks locais do projeto:
-
-  ```powershell
-  powershell -ExecutionPolicy Bypass -File .\scripts\setup-git-hooks.ps1
-  ```
-
-  Hooks configurados:
-  - `.githooks/pre-commit`: valida frontend lint + backend pytest
-  - `.githooks/pre-push`: valida frontend lint/test + backend pytest
-
-  Ambos chamam o CLI local do projeto:
-  - `scripts/qa-cli.sh` (shell)
-  - `scripts/qa-cli.ps1` (PowerShell)
-
-  Uso manual no PowerShell:
-
-  ```powershell
-  powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-commit
-  powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 pre-push
-  powershell -ExecutionPolicy Bypass -File .\scripts\qa-cli.ps1 full
-  ```
-
-  ## GitLab CI
-
-  Arquivo pronto: `.gitlab-ci.yml`
-
-  Pipeline configurado com dois jobs:
-  - `frontend_tests`: instala dependencias e roda lint, testes e build do frontend
-  - `backend_tests`: instala dependencias Python e roda pytest do backend
-
-  ## Endpoints principais
-
-  Prefixo da API: /api
-
-  - GET /produtos
-  - GET /produtos/categorias
-  - GET /produtos/{id_produto}
-  - POST /produtos
-  - PUT /produtos/{id_produto}
-  - DELETE /produtos/{id_produto}
-
-  Healthcheck:
-  - GET /
-
-  ## CI/CD
-
-  Pipeline automatizado configurado para validar frontend e backend:
-
-  - **Frontend**: lint (ESLint), testes (Vitest) e build
-  - **Backend**: testes (pytest)
-
-  ## Estrutura do codigo
-
-  ### Backend
-
-  Organizacao por responsabilidade:
-  - `models/`: definicoes de banco SQLAlchemy
-  - `schemas/`: validacao Pydantic para request/response
-  - `routers/`: endpoints da API
-  - `database.py`: conexao e sessao
-  - `data_ingestion.py`: compatibilidade legada, sem uso no fluxo atual
-  - `main.py`: configuracao FastAPI
-
-  ### Frontend
-
-  Arquitetura modularizada:
-  - `src/features/catalog/`: dominio de catálogo isolado
-    - `types.ts`: tipos TypeScript
-    - `api.ts`: chamadas HTTP
-    - `utils.ts`: utilitarios (busca, paginacao)
-    - `useCatalogPanel.ts`: gerenciamento de estado
-    - `components/`: componentes UI
-    - `CatalogPage.tsx`: pagina principal
-  - `src/App.tsx`: entrada da aplicacao
-  - `src/App.css`: estilos globais
-
-  ## Status atual da entrega
-
-  ✅ Backend funcional
-  - CRUD de produtos com validacoes
-  - Testes cobrindo cenarios principais
-
-  ✅ Frontend funcional
-  - Listagem e filtros
-  - Detalhes com historico de vendas e avaliacoes
-  - Criacao, edicao e remocao de produtos
-  - Tratamento de erros com mensagens claras
-  - Pronto para produção (Vercel ou similar)
-
-  ## DevOps
-  - CI/CD automatizado
-  - CI GitLab Pipeline (`.gitlab-ci.yml`)
-  - Git hooks pre-push/pre-commit
-  - QA CLI local versionado
+```powershell
+cd frontend
+corepack pnpm test --run
+```
